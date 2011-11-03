@@ -22,15 +22,19 @@ class Upload extends CI_Controller {
         $config['max_height'] = '768';
         
         $this->load->library('upload', $config);
-        
+        $this->load->library('session');
+
         if (!$this->upload->do_upload())
         {
             $error = array('error' => $this->upload->display_errors());
-            $this->load->view('upload_form', $error);
+            $this->load->view('upload_image', $error);
         }
         else
         {
-            $data = array('upload_data' => $this->upload->data());
+            $upload = $this->upload->data();
+            $data = array('upload_data' => $upload);
+            $this->load->model('Images');
+            $this->Images->insert_image($this->session->userdata('userid'), $upload["file_name"], $this->input->post('day'));
             $this->load->view('upload_success', $data);
         }
     }
